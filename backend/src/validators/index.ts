@@ -1,0 +1,80 @@
+import { z } from "zod";
+import {
+  APPLICATION_STATUSES,
+  DOCUMENT_STATUSES,
+  PAYMENT_STATUSES,
+  STAFF_AVAILABILITY_STATUSES,
+  STAFF_STATUSES,
+} from "../types/domain";
+
+export const createApplicationSchema = z.object({
+  type: z.string().min(2, "Application type is required"),
+  fee: z.number().min(0).optional(),
+  remarks: z.string().optional(),
+});
+
+export const updateApplicationSchema = z.object({
+  status: z.enum(APPLICATION_STATUSES as [string, ...string[]]).optional(),
+  assignedStaffId: z.string().optional(),
+  assignedStaffName: z.string().optional(),
+  remarks: z.string().optional(),
+  type: z.string().optional(),
+  fee: z.number().min(0).optional(),
+});
+
+export const uploadDocumentSchema = z.object({
+  applicationId: z.string().min(1),
+  type: z.string().min(1),
+});
+
+export const updateDocumentStatusSchema = z.object({
+  status: z.enum(DOCUMENT_STATUSES as [string, ...string[]]),
+  remarks: z.string().optional(),
+});
+
+export const updateStaffStatusSchema = z.object({
+  staffStatus: z.enum(STAFF_STATUSES as [string, ...string[]]),
+});
+
+export const assignStaffToTeamLeaderSchema = z.object({
+  staffIds: z.array(z.string().min(1)).min(1),
+});
+
+export const updateStaffAvailabilitySchema = z.object({
+  availabilityStatus: z.enum(STAFF_AVAILABILITY_STATUSES as [string, ...string[]]),
+});
+
+export const createPaymentSchema = z.object({
+  applicationId: z.string().min(1),
+  method: z.string().min(1),
+});
+
+export const verifyPaymentSchema = z.object({
+  orderId: z.string().min(1),
+  paymentId: z.string().min(1),
+  signature: z.string().min(1),
+});
+
+export const updatePaymentStatusSchema = z.object({
+  status: z.enum(PAYMENT_STATUSES as [string, ...string[]]),
+});
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(2).optional(),
+  avatarUrl: z.string().url().optional(),
+  department: z.string().optional(),
+  licenseType: z.string().optional(),
+});
+
+export const createTeamLeaderSchema = z.object({
+  name: z.string().trim().min(2).max(100),
+  email: z.string().trim().toLowerCase().email(),
+  phone: z.string().trim().min(8).max(20),
+  password: z.string().min(8).max(128),
+  department: z.enum(["Licensing", "Verification", "Payments"]).optional(),
+});
+
+export const updateTeamLeaderSchema = createTeamLeaderSchema.partial().omit({ password: true });
+export const toggleTeamLeaderSchema = z.object({ active: z.boolean() });
+export const removeStaffSchema = z.object({ staffId: z.string().min(1) });
+export const assignClientSchema = z.object({ staffId: z.string().min(1) });
